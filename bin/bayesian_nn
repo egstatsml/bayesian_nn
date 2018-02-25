@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import argparse
+
+import numpy as np
+from edward.models import Normal, Bernoulli
+
+from bayesian_nn import bnn
+
+
+def program_test_gp_prior(arguments):
+    parser = argparse.ArgumentParser(prog="test_gp_prior",
+                                     description='Testing a GP prior on params')
+    parser.add_argument('-dims', '--list', nargs='+',
+                        help='list of the number of hidden units in each layer')
+    parser.add_argument('--dist', type=str,
+                        default="normal",
+                        help="the distribution to use")
+    parser.add_argument('--mean', default=None,
+                        help="to be used with normal dist.")
+    parser.add_argument('--var', default=None,
+                        help="to be used with normal dist.")
+    parser.add_argument('--beta', default=None,
+                        help="to be used with XXX dist.")
+    args = parser.parse_args(arguments)
+    #order hyperparameters into a dict
+    hyperparams = {"mean":args.mean, "var":args.var, "beta":args.beta}
+    #initialise parameters
+    dims = args.list
+    weights, bias = bnn.initialise_params(dims, args.dist, hyperparams)
+    print weights
+    return 0
+
+
+def main(arguments):
+    parser = argparse.ArgumentParser(prog="bayesian_nn", description='Command line args')
+    parser.add_argument('program', type=str,
+                        help='name of program to run')
+    parser.add_argument('args', nargs=argparse.REMAINDER,
+                        help="arguments to be sent to individual programs")
+    args, program_args = parser.parse_known_args(arguments)
+    print args.args
+    if(args.program == "test-gp-prior"):
+        program_test_gp_prior(args.args)
+    else:
+        print("Program name incorrect :(")
+        return -1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
+
+    
