@@ -3,14 +3,20 @@
 import sys
 import os
 import argparse
-
+import errno 
 import numpy as np
 from edward.models import Normal, Bernoulli
 
-from bayesian_nn import bnn
+from bnn import bnn
 
 
 def program_test_gp_prior(arguments):
+    """
+    program_test_gp_prior()
+    Description:
+    testing output from two distinct real variables over the prior 
+    distributions of parameters in Bayesian NN
+    """
     parser = argparse.ArgumentParser(prog="test_gp_prior",
                                      description='Testing a GP prior on params')
     parser.add_argument('-dims', '--list', nargs='+',
@@ -30,8 +36,8 @@ def program_test_gp_prior(arguments):
     #initialise parameters
     dims = args.list
     weights, bias = bnn.initialise_params(dims, args.dist, hyperparams)
-    print weights
-    return 0
+
+    return os.EX_OK
 
 
 def main(arguments):
@@ -41,12 +47,12 @@ def main(arguments):
     parser.add_argument('args', nargs=argparse.REMAINDER,
                         help="arguments to be sent to individual programs")
     args, program_args = parser.parse_known_args(arguments)
-    print args.args
     if(args.program == "test-gp-prior"):
         program_test_gp_prior(args.args)
     else:
         print("Program name incorrect :(")
-        return -1
+        #/* No such process */
+        return errno.ESRCH
 
 
 if __name__ == "__main__":
