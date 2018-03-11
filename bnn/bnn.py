@@ -42,7 +42,7 @@ class InvalidActivationError(ValueError):
 
 
 
-def initialise_params(dims, dist = "normal", hyperparams = None):
+def initialise_params(dims, seed, dist = "normal", hyperparams = None):
     """
     Description:
     Will in initialise parameters based of the Bayesian NN 
@@ -98,8 +98,9 @@ def simple_feed_forward(X, weights, bias, activation):
         (tf.tensor) output of network
     """
     A = X
-    for l in range(1, len(weights)):  
-        Z = tf.matmul(weights[l], x) + bias[l]
+    for l in range(1, len(weights)):
+        print l
+        Z = tf.matmul(weights[l], A) + bias[l]
         #apply non-linear activation function
         if(activation[l] == "tanh"):
             A = tf.tanh(Z)
@@ -136,11 +137,13 @@ def _initialise_normal(dims, hyperparams):
     if('mean' not in hyperparams.keys()) or ('var' not in hyperparams.keys()):
         raise InvalidHyperparamsError(hyperparams)
 
-    weights = []
-    bias = []
+    #we will set the first weights array to be all ones, as it wont actually
+    #be used, just doing it for notational convenience and to mantain
+    #consistancy
+    weights = [tf.ones([dims[0],1])]
+    bias = [tf.ones([dims[0],1])]
     mean = np.float(hyperparams['mean'])
     var = np.float(hyperparams['var'])
-    
     for ii in range(1, len(dims)):
         weights.append(Normal(loc=tf.ones([dims[ii], dims[ii-1]]) * mean,
                                scale=tf.ones([dims[ii], dims[ii-1]])*var))
