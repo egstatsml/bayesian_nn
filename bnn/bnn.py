@@ -47,22 +47,29 @@ def initialise_params(dims, dist = "normal", hyperparams = None):
     Description:
     Will in initialise parameters based of the Bayesian NN 
     Keyword arguments:
-    dims = a list of ints that indicate the number of hidden units
-           in each hidden layer
-    weights = a list of Edward model variables that hold the weights
-    bias = a list of Edward model variables that hold the bias'
-    dist = an optional input; a string that indicates the type of 
-    distribution we want
-    hyperparams = an optional input; dict that will hold hyperparameters
-    of how to initialise the 
-                  the weights/bias of each layer.
-                  Eg. for a normal distribution {'mean':0, 'var':1}
-
+    dims (list(ints)) indicate the number of hidden units
+        in each hidden layer
+    weights (list(tf.tensor)) Edward model variables 
+        that hold the weights
+    bias (list(tf.tensor)) Edward model variables 
+        that hold the bias'
+    dist (string) an optional input; a string that indicates the type of 
+        distribution we want
+    hyperparams (dict) an optional input; will hold hyperparameters
+        of how to initialise the the weights/bias of each layer
+        Eg. for a normal distribution {'mean':0, 'var':1}
+    seed (bool) whether we want to seed the RNG
+    Returns:
+        (list(tf.tensor)) of layer weights
+        (list(tf.tensor)) of layer bias vectors
     """
     #check all our inputs are correct format
     if(not isinstance(dims, list)):
         raise DimensionTypeError(dims)
-    
+    #if we need to se the seed
+    #currently just use a constant seed value
+    if(seed):
+        ed.util.set_seed(0)
     #now initialise the params as specified
     if(dist == "normal"):
         weights, bias = _initialise_normal(dims, hyperparams)
@@ -73,25 +80,26 @@ def initialise_params(dims, dist = "normal", hyperparams = None):
     
 
 
-def simple_feed_forward(x, weights, bias, activation):
+def simple_feed_forward(X, weights, bias, activation):
     """
     feed_forward()
     Description:
     Will forward pass input data through the layers
     Args:
-        x (tf.tensor) Input data as either an matrix or as a column 
-        vector weights (tf.tensor)  list of weights for each layer
-        activation (list) list of strings indicating how activation 
-        is done at each layer
+        X (tf.tensor) Input data as either an matrix or as a column 
+            vector weights (tf.tensor)  list of weights for each layer
+        activation (list(str)) list of strings indicating how activation 
+            is done at each layer
+        weights (list(tf.tensor)) list of weights for each layer
+        bias (list(tf.tensor)) list of weights for each layer
+        activation (list(str)) list of string indicating the activation 
+            type for each layer
     Returns:
         (tf.tensor) output of network
     """
-    for l in range(1, len(weights)):
-        #for the first pass will initialise output of the individual layer as
-        #the input data
-        if l == 0:
-            A = X
-        Z = tf.matmul(weights[0], x) + bias[0]
+    A = X
+    for l in range(1, len(weights)):  
+        Z = tf.matmul(weights[l], x) + bias[l]
         #apply non-linear activation function
         if(activation[l] == "tanh"):
             A = tf.tanh(Z)
