@@ -145,8 +145,18 @@ def _initialise_normal(dims, hyperparams):
     mean = np.float(hyperparams['mean'])
     var = np.float(hyperparams['var'])
     for ii in range(1, len(dims)):
-        weights.append(Normal(loc=tf.ones([dims[ii], dims[ii-1]]) * mean,
-                               scale=tf.ones([dims[ii], dims[ii-1]])*var))
-        bias.append(Normal(loc=tf.ones([dims[ii], dims[ii-1]]) * mean,
-                               scale=tf.ones([dims[ii], 1])*var))
+        if(ii == len(dims) -1):
+            bias_var = 0.1
+            #find the number of hidden units to form variance for output weights
+            #(units between first and last layer)
+            print (dims[1:-1])
+            weight_var = 1/(np.sqrt(np.sum(map(float,dims[1:-1]))))
+        else:
+            bias_var = var
+            weight_var = var
+                                                            
+        weights.append(Normal(loc=tf.ones([dims[ii], dims[ii-1]])*mean,
+                              scale=tf.ones([dims[ii],dims[ii-1]])*weight_var))
+        bias.append(Normal(loc=tf.ones([dims[ii], 1]) * mean,
+                               scale=tf.ones([dims[ii], 1]) * weight_var))
     return weights, bias

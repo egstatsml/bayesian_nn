@@ -35,7 +35,7 @@ def program_test_gp_prior(arguments):
                         help="to be used with normal dist.")
     parser.add_argument('--beta', default=None,
                         help="to be used with XXX dist.")
-    parser.add_argument('--seed', action='store_false',
+    parser.add_argument('--seed', action='store_true',
                         help="if want to manually set seed")
     parser.add_argument('--iters', type=int,
                         help="how many times we want to initialise the weights")
@@ -44,22 +44,27 @@ def program_test_gp_prior(arguments):
     #make the directory where we will save the data
     if(not os.path.isdir(os.path.join("./", str(args.data)))):
        os.makedirs(os.path.join("./", str(args.data)))
-       
+    output = np.zeros((args.iters,1))
     #order hyperparameters into a dict
     hyperparams = {"mean":args.mean, "var":args.var, "beta":args.beta}
     #initialise parameters
     dims = args.list
+    #if we need to se the seed
+    #currently just use a constant seed value
+    if(args.seed):
+        ed.util.set_seed(0)
     #generate data (for now, will be just scalars)
-    X = -0.4 * tf.ones([dims[0],1])
+    X = args.data * tf.ones([dims[0],1])
     activation = ["none", "tanh", "none"] 
+    weights, bias = bnn.initialise_params(dims, args.dist, hyperparams)
+    sess = tf.Session()
     for i in range(0, args.iters):
-        sess = tf.Session()
-        weights, bias = bnn.initialise_params(dims, args.seed,
-                                              args.dist, hyperparams)
         #now perform the feed forward
         A = bnn.simple_feed_forward(X, weights, bias, activation)
-        sess.run(A)
-        print A
+        output[i] = (sess.run(A))
+
+    print output
+    np.save(os.path.join("./", str(args.data), str(dims[1])), output)
     return os.EX_OK
 
 
@@ -70,7 +75,6 @@ def main(arguments):
     test-gp-prior       investigate how a Gaussian prior results in 
                         Gaussian Process
     """
-    print main.__doc__
     parser = argparse.ArgumentParser(prog='bayesian_nn',
                                      epilog=main.__doc__,
                                      formatter_class=
