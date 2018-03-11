@@ -18,7 +18,7 @@ def program_test_gp_prior(arguments):
     distributions of parameters in Bayesian NN
     """
     parser = argparse.ArgumentParser(prog="test_gp_prior",
-                                     description='Testing a GP prior on params')
+                                     epilog=program_test_gp_prior.__doc__)
     parser.add_argument('-dims', '--list', nargs='+',
                         help='list of the number of hidden units in each layer')
     parser.add_argument('--dist', type=str,
@@ -41,11 +41,22 @@ def program_test_gp_prior(arguments):
 
 
 def main(arguments):
-    parser = argparse.ArgumentParser(prog="bayesian_nn", description='Command line args')
+    """
+    main()
+    programs:
+    test-gp-prior        investigate how a Gaussian prior results in 
+    Gaussian Process
+    """
+    print main.__doc__
+    parser = argparse.ArgumentParser(prog='bayesian_nn',
+                                     epilog=main.__doc__,
+                                     formatter_class=
+                                     argparse.RawDescriptionHelpFormatter)
     parser.add_argument('program', type=str,
                         help='name of program to run')
     parser.add_argument('args', nargs=argparse.REMAINDER,
                         help="arguments to be sent to individual programs")
+    args = parser.parse_args(arguments)
     args, program_args = parser.parse_known_args(arguments)
     if(args.program == "test-gp-prior"):
         program_test_gp_prior(args.args)

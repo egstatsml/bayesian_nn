@@ -85,7 +85,7 @@ def simple_feed_forward(x, weights, bias, activation):
     """
     for l in range(1, len(weights)):
         #for the first pass will initialise output of the individual layer as the input data
-        if l = 0:
+        if l == 0:
             A = X
         Z = tf.matmul(weights[0], x) + bias[0]
         #apply non-linear activation function
