@@ -11,18 +11,18 @@ from edward.models import Normal, Bernoulli
 
 class DimensionTypeError(TypeError):
     def __init__(self, dims):
-        print("""Incorrect type for initialising dimensions. Input of type {} but need input
-        list""".format(type(dims)))
+        print("""Incorrect type for initialising dimensions. 
+        Input of type {} but need input list""".format(type(dims)))
 
 class WeightTypeError(TypeError):
     def __init__(self, weights):
-        print("""Incorrect type for initialising weights. Input of type {} but need input
-        list""".format(type(weights)))
+        print("""Incorrect type for initialising weights. 
+        Input of type {} but need input list""".format(type(weights)))
 
 class BiasTypeError(TypeError):
     def __init__(self, bias):
-        print("""Incorrect type for initialising bias. Input of type {} but need input
-        list""".format(type(bias)))        
+        print("""Incorrect type for initialising bias. 
+        Input of type {} but need input list""".format(type(bias)))        
 
 class DistNotImplementedError(NotImplementedError):
     def __init__(self, dist):
@@ -44,19 +44,21 @@ class InvalidActivationError(ValueError):
 
 def initialise_params(dims, dist = "normal", hyperparams = None):
     """
-    initialise_params()
-    
     Description:
     Will in initialise parameters based of the Bayesian NN 
     Keyword arguments:
-    dims = a list of ints that indicate the number of hidden units in each hidden layer
+    dims = a list of ints that indicate the number of hidden units
+           in each hidden layer
     weights = a list of Edward model variables that hold the weights
     bias = a list of Edward model variables that hold the bias'
-    dist = an optional input; a string that indicates the type of distribution we want
-    hyperparams = an optional input; dict that will hold hyperparameters of how to initialise the 
+    dist = an optional input; a string that indicates the type of 
+    distribution we want
+    hyperparams = an optional input; dict that will hold hyperparameters
+    of how to initialise the 
                   the weights/bias of each layer.
                   Eg. for a normal distribution {'mean':0, 'var':1}
-"""
+
+    """
     #check all our inputs are correct format
     if(not isinstance(dims, list)):
         raise DimensionTypeError(dims)
@@ -77,14 +79,16 @@ def simple_feed_forward(x, weights, bias, activation):
     Description:
     Will forward pass input data through the layers
     Args:
-        x (tf.tensor) Input data as either an matrix or as a column vector
-        weights (tf.tensor)  list of weights for each layer
-        activation (list) list of strings indicating how activation is done at each layer
+        x (tf.tensor) Input data as either an matrix or as a column 
+        vector weights (tf.tensor)  list of weights for each layer
+        activation (list) list of strings indicating how activation 
+        is done at each layer
     Returns:
         (tf.tensor) output of network
     """
     for l in range(1, len(weights)):
-        #for the first pass will initialise output of the individual layer as the input data
+        #for the first pass will initialise output of the individual layer as
+        #the input data
         if l == 0:
             A = X
         Z = tf.matmul(weights[0], x) + bias[0]
@@ -94,76 +98,6 @@ def simple_feed_forward(x, weights, bias, activation):
         elif(activation[l] == "relu"):
             A = tf.nn.relu(Z)
         elif(activation[l] == "sigmoid"):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             A = tf.sigmoid(Z)
         #if no activation is applied
         elif(activation[l] == "none"):
@@ -182,10 +116,11 @@ def _initialise_normal(dims, hyperparams):
     Description:
     Will in initialise parameters for Bayesian NN with Normal distribution
     Args:
-        dims = a list of ints that indicate the number of hidden units in each hidden layer
-        hyperparams = an optional input; dict that will hold hyperparameters of how to 
-        initialise the the weights/bias of each layer. Eg. for a normal
-        distribution {'mean':0, 'var':1}
+        dims = a list of ints that indicate the number of hidden units 
+        in each hidden layer
+        hyperparams = an optional input; dict that will hold hyperparameters 
+        of how to initialise the the weights/bias of each layer.
+        Eg. for a normal distribution {'mean':0, 'var':1}
     """
     #check that the hyperparameters are correct
     if(hyperparams == None):
