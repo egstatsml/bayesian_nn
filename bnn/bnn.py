@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import edward as ed
 from edward.models import Normal, Bernoulli
 
 
@@ -42,7 +43,7 @@ class InvalidActivationError(ValueError):
 
 
 
-def initialise_params(dims, seed, dist = "normal", hyperparams = None):
+def initialise_params(dims, dist = "normal", hyperparams = None):
     """
     Description:
     Will in initialise parameters based of the Bayesian NN 
@@ -58,7 +59,6 @@ def initialise_params(dims, seed, dist = "normal", hyperparams = None):
     hyperparams (dict) an optional input; will hold hyperparameters
         of how to initialise the the weights/bias of each layer
         Eg. for a normal distribution {'mean':0, 'var':1}
-    seed (bool) whether we want to seed the RNG
     Returns:
         (list(tf.tensor)) of layer weights
         (list(tf.tensor)) of layer bias vectors
@@ -66,10 +66,6 @@ def initialise_params(dims, seed, dist = "normal", hyperparams = None):
     #check all our inputs are correct format
     if(not isinstance(dims, list)):
         raise DimensionTypeError(dims)
-    #if we need to se the seed
-    #currently just use a constant seed value
-    if(seed):
-        ed.util.set_seed(0)
     #now initialise the params as specified
     if(dist == "normal"):
         weights, bias = _initialise_normal(dims, hyperparams)
@@ -99,7 +95,6 @@ def simple_feed_forward(X, weights, bias, activation):
     """
     A = X
     for l in range(1, len(weights)):
-        print l
         Z = tf.matmul(weights[l], A) + bias[l]
         #apply non-linear activation function
         if(activation[l] == "tanh"):
