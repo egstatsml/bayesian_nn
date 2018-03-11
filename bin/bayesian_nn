@@ -5,6 +5,7 @@ import os
 import argparse
 import errno 
 import numpy as np
+import tensorflow as tf
 from edward.models import Normal, Bernoulli
 
 from bnn import bnn
@@ -16,11 +17,15 @@ def program_test_gp_prior(arguments):
     Description:
     testing output from two distinct real variables over the prior 
     distributions of parameters in Bayesian NN
+    Aiming to replicate the results shown in (Neal, 1996 pg.33)
     """
     parser = argparse.ArgumentParser(prog="test_gp_prior",
                                      epilog=program_test_gp_prior.__doc__)
     parser.add_argument('-dims', '--list', nargs='+',
                         help='list of the number of hidden units in each layer')
+    parser.add_argument('--data', type=float,
+                        default=0.1,
+                        help="value of scalar data point")
     parser.add_argument('--dist', type=str,
                         default="normal",
                         help="the distribution to use")
@@ -30,13 +35,31 @@ def program_test_gp_prior(arguments):
                         help="to be used with normal dist.")
     parser.add_argument('--beta', default=None,
                         help="to be used with XXX dist.")
+    parser.add_argument('--seed', action='store_false',
+                        help="if want to manually set seed")
+    parser.add_argument('--iters', type=int,
+                        help="how many times we want to initialise the weights")
     args = parser.parse_args(arguments)
+
+    #make the directory where we will save the data
+    if(not os.path.isdir(os.path.join("./", str(args.data)))):
+       os.makedirs(os.path.join("./", str(args.data)))
+       
     #order hyperparameters into a dict
     hyperparams = {"mean":args.mean, "var":args.var, "beta":args.beta}
     #initialise parameters
     dims = args.list
-    weights, bias = bnn.initialise_params(dims, args.dist, hyperparams)
-
+    #generate data (for now, will be just scalars)
+    X = -0.4 * tf.ones([dims[0],1])
+    activation = ["none", "tanh", "none"] 
+    for i in range(0, args.iters):
+        sess = tf.Session()
+        weights, bias = bnn.initialise_params(dims, args.seed,
+                                              args.dist, hyperparams)
+        #now perform the feed forward
+        A = bnn.simple_feed_forward(X, weights, bias, activation)
+        sess.run(A)
+        print A
     return os.EX_OK
 
 
@@ -44,8 +67,8 @@ def main(arguments):
     """
     main()
     programs:
-    test-gp-prior        investigate how a Gaussian prior results in 
-    Gaussian Process
+    test-gp-prior       investigate how a Gaussian prior results in 
+                        Gaussian Process
     """
     print main.__doc__
     parser = argparse.ArgumentParser(prog='bayesian_nn',
