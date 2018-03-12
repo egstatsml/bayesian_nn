@@ -70,8 +70,7 @@ def initialise_params(dims, dist = "normal", hyperparams = None):
     if(dist == "normal"):
         weights, bias = _initialise_normal(dims, hyperparams)
     else:
-        raise DistributionNotImplementedError(dist)
-    
+        raise DistributionNotImplementedError(dist)    
     return weights, bias
     
 
@@ -98,11 +97,11 @@ def simple_feed_forward(X, weights, bias, activation):
         Z = tf.matmul(weights[l], A) + bias[l]
         #apply non-linear activation function
         if(activation[l] == "tanh"):
-            A = tf.tanh(Z)
+            A = tf.nn.tanh(Z)
         elif(activation[l] == "relu"):
             A = tf.nn.relu(Z)
         elif(activation[l] == "sigmoid"):
-            A = tf.sigmoid(Z)
+            A = tf.nn.sigmoid(Z)
         #if no activation is applied
         elif(activation[l] == "none"):
             A = Z

@@ -23,9 +23,6 @@ def program_test_gp_prior(arguments):
                                      epilog=program_test_gp_prior.__doc__)
     parser.add_argument('-dims', '--list', nargs='+',
                         help='list of the number of hidden units in each layer')
-    parser.add_argument('--data', type=float,
-                        default=0.1,
-                        help="value of scalar data point")
     parser.add_argument('--dist', type=str,
                         default="normal",
                         help="the distribution to use")
@@ -40,32 +37,61 @@ def program_test_gp_prior(arguments):
     parser.add_argument('--iters', type=int,
                         help="how many times we want to initialise the weights")
     args = parser.parse_args(arguments)
-
+    dims = args.list
     #make the directory where we will save the data
-    if(not os.path.isdir(os.path.join("./", str(args.data)))):
-       os.makedirs(os.path.join("./", str(args.data)))
-    output = np.zeros((args.iters,1))
+    if(not os.path.isdir(os.path.join("./", str(dims[1])))):
+       os.makedirs(os.path.join("./", str(dims[1])))
+    output = np.zeros((args.iters,2))
     #order hyperparameters into a dict
     hyperparams = {"mean":args.mean, "var":args.var, "beta":args.beta}
     #initialise parameters
-    dims = args.list
     #if we need to se the seed
     #currently just use a constant seed value
     if(args.seed):
         ed.util.set_seed(0)
     #generate data (for now, will be just scalars)
-    X = args.data * tf.ones([dims[0],1])
+    X_np = np.array([-0.2, 0.4]).reshape([1,2]).astype(np.float32)
+    X = tf.convert_to_tensor(X_np)
     activation = ["none", "tanh", "none"] 
     weights, bias = bnn.initialise_params(dims, args.dist, hyperparams)
     sess = tf.Session()
     for i in range(0, args.iters):
         #now perform the feed forward
         A = bnn.simple_feed_forward(X, weights, bias, activation)
-        output[i] = (sess.run(A))
-
-    print output
-    np.save(os.path.join("./", str(args.data), str(dims[1])), output)
+        output[i,:] = (sess.run(A))
+    np.save(os.path.join("./", str(dims[1]), str(dims[1])), output)
     return os.EX_OK
+
+
+
+def program_plot_prior_tests(arguments):
+    """
+    program_test_gp_prior()
+    Description:
+    Plots test results from program_test_priors
+    """
+    parser = argparse.ArgumentParser(prog="plot-prior-tests",
+                                     epilog=program_test_gp_prior.__doc__)
+    parser.add_argument('input', type=str,
+                        help="path to 2D output from test-gp-prior")
+    parser.add_argument('num', type=str,
+                        help="number of hidden layers")
+    parser.add_argument('out', type=str,
+                        help="where to save the figure")
+    args = parser.parse_args(arguments)
+    
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    data = np.load(args.input)
+    
+    plt.figure()
+    plt.scatter(data[:,0], data[:,1])
+    plt.title('H = ' + args.num)
+    plt.savefig(args.out)
+    
+    return os.EX_OK
+
 
 
 def main(arguments):
@@ -87,6 +113,8 @@ def main(arguments):
     args, program_args = parser.parse_known_args(arguments)
     if(args.program == "test-gp-prior"):
         program_test_gp_prior(args.args)
+    elif(args.program == "plot-prior-tests"):
+        program_plot_prior_tests(args.args)
     else:
         print("Program name incorrect :(")
         #/* No such process */
