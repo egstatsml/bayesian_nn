@@ -103,7 +103,7 @@ def simple_feed_forward(X, weights, bias, activation):
         elif(activation[l] == "sigmoid"):
             A = tf.nn.sigmoid(Z)
         #Neal proposes using sign functions for some derivations
-        elif(activation[l] = "sign"):
+        elif(activation[l] == "sign"):
             A = tf.sign(Z)
         #if no activation is applied
         elif(activation[l] == "none"):
