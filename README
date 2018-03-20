@@ -1,0 +1,39 @@
+Python package containing code to test development of Bayesian Neural Networks
+
+Author: Ethan Goan
+
+How to run:
+
+1) Install dependencies:
+   Anaconda - https://anaconda.org/anaconda/python
+   Tensorflow - https://www.tensorflow.org/install/ (can just install CPU version, current code not computationally expensive)
+   Edward - http://edwardlib.org/getting-started (to install just run pip install edward)
+
+2) add this package to your python path
+   To do this, run in bash shell (sorry windows users)
+   export PYTHONPATH=$PYTHONPATH:<path to where you cloned this repo>
+
+3) All scripts are located in the bin directory
+   the ./bin/bayesian_nn script contains most of the programs of interest
+   to get information on these programs, run
+   ./bin/bayesian_nn -h
+
+   To get more information on an individual program, run
+   ./bin/bayesian_nn <name of individual program> -h
+
+
+Examples:
+
+Running the test-gp-prior with 1 hidden unit and 1 hidden layer
+./bin/bayesian_nn test-gp-prior -dims 1 1 1 --dist normal --mean 0 --var 5 --iter 1000
+
+Running the test-gp-prior with 100 hidden unit and 1 hidden layer
+./bin/bayesian_nn test-gp-prior -dims 1 100 1 --dist normal --mean 0 --var 5 --iter 1000
+
+Changing the variance of the prior placed over model parameters
+./bin/bayesian_nn test-gp-prior -dims 1 100 1 --dist normal --mean 0 --var 10 --iter 1000
+
+
+After running one of the above scripts, lets plot the data
+Say we used 3 hidden units for a single hidden layer
+./bin/bayesian_nn plot-prior-tests ./3/3.npy 3 3.eps
